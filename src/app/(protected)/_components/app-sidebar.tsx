@@ -2,10 +2,9 @@
 import { CalendarDays, LayoutDashboard, LogOut, Stethoscope, UsersRound } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   Sidebar,
@@ -47,6 +46,8 @@ const items = [
 export function AppSidebar() {
   const router = useRouter()
   const session = authClient.useSession()
+  const pathname = usePathname()
+
   const handleSignOut = async () => {
     await authClient.signOut({
       fetchOptions: {
@@ -67,8 +68,8 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                <SidebarMenuItem key={item.title }>
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
