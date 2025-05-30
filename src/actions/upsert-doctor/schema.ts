@@ -1,9 +1,8 @@
-import { z } from "zod"
+import { z } from "zod";
 
-
-export const upsertDoctorSchema = z  
- .object({
-    id: z.string().optional(),
+export const upsertDoctorSchema = z
+  .object({
+    id: z.string().uuid().optional(),
     name: z.string().trim().min(1, {
       message: "Nome é obrigatório.",
     }),
@@ -21,13 +20,16 @@ export const upsertDoctorSchema = z
     availableToTime: z.string().min(1, {
       message: "Hora de término é obrigatória.",
     }),
-  }).refine((data) => {
-      const availableFromTime = new Date(`1970-01-01T${data.availableFromTime}`)
-      const availableToTime = new Date(`1970-01-01T${data.availableToTime}`)
-      return availableFromTime < availableToTime
-    }, {
-      message: "O horário de início não pode ser anterior ao horário de término.",
-      path: ["availableToTime"],
   })
+  .refine(
+    (data) => {
+      return data.availableFromTime < data.availableToTime;
+    },
+    {
+      message:
+        "O horário de início não pode ser anterior ao horário de término.",
+      path: ["availableToTime"],
+    },
+  );
 
-  export type UpsertDoctorSchema = z.infer<typeof upsertDoctorSchema>
+export type UpsertDoctorSchema = z.infer<typeof upsertDoctorSchema>;

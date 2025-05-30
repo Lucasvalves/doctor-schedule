@@ -1,29 +1,22 @@
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import { auth } from "@/lib/auth"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { auth } from "@/lib/auth";
 
-import LoginForm from "./componets/login-form"
-import SignUpForm from "./componets/sign-up-form"
+import LoginForm from "./components/login-form";
+import SignUpForm from "./components/sign-up-form";
 
-
-async function AuthenticationPage() {
+const AuthenticationPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
-  })
+  });
   if (session?.user) {
-    redirect("/dashboard")
+    redirect("/dashboard");
   }
   return (
     <div className="flex h-screen w-screen items-center justify-center">
-
-      <Tabs defaultValue="account" className="w-[400px]">
+      <Tabs defaultValue="login" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="register">Criar conta</TabsTrigger>
@@ -36,7 +29,7 @@ async function AuthenticationPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
 export default AuthenticationPage;
