@@ -1,28 +1,43 @@
-"use client"
-import { CalendarIcon, DollarSign } from "lucide-react";
+"use client";
+
+import {
+  CalendarIcon,
+  ClockIcon,
+  DollarSignIcon,
+
+} from "lucide-react";
+import { useAction } from "next-safe-action/hooks";import { useState } from "react";
+
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { doctorsTable } from "@/db/schema";
+import { formatCurrencyInCents } from "@/helpers/currency";
 
 import { getAvailability } from "../_helpers/availability";
 import UpsertDoctorForm from "./upsert-doctor-form";
-import { formatCurrencyInCents } from "@/helpers/currency";
 
 interface DoctorCardProps {
   doctor: typeof doctorsTable.$inferSelect;
 }
 
 const DoctorCard = ({ doctor }: DoctorCardProps) => {
+  const [isUpsertDoctorDialogOpen, setIsUpsertDoctorDialogOpen] =
+    useState(false);
+
   const doctorInitials = doctor.name
     .split(" ")
     .map((name) => name[0])
     .join("");
-
   const availability = getAvailability(doctor);
 
   return (
@@ -33,8 +48,8 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
             <AvatarFallback>{doctorInitials}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-sm font-medium">{doctor.name}</p>
-            <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+            <h3 className="text-sm font-medium">{doctor.name}</h3>
+            <p className="text-muted-foreground text-sm">{doctor.specialty}</p>
           </div>
         </div>
       </CardHeader>
@@ -45,27 +60,36 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
           {availability.from.format("dddd")} a {availability.to.format("dddd")}
         </Badge>
         <Badge variant="outline">
-          <DollarSign className="mr-1" />
-          {availability.from.format("HH:mm")} as {availability.to.format("HH:mm")}
+          <ClockIcon className="mr-1" />
+          {availability.from.format("HH:mm")} as{" "}
+          {availability.to.format("HH:mm")}
         </Badge>
         <Badge variant="outline">
-          <DollarSign className="mr-1" />
-          {formatCurrencyInCents(doctor.appointmentPriceInCents)} 
+          <DollarSignIcon className="mr-1" />
+          {formatCurrencyInCents(doctor.appointmentPriceInCents)}
         </Badge>
       </CardContent>
       <Separator />
-      <CardFooter>
-        <Dialog>
+      <CardFooter className="flex flex-col gap-2">
+        <Dialog
+          open={isUpsertDoctorDialogOpen}
+          onOpenChange={setIsUpsertDoctorDialogOpen}
+        >
           <DialogTrigger asChild>
-            <Button className="w-full">
-              Ver detalhes
-            </Button>
+            <Button className="w-full">Ver detalhes</Button>
           </DialogTrigger>
-          <UpsertDoctorForm />
+          <UpsertDoctorForm
+            doctor={{
+              ...doctor,
+              availableFromTime: availability.from.format("HH:mm:ss"),
+              availableToTime: availability.to.format("HH:mm:ss"),
+            }}
+            onSuccess={() => setIsUpsertDoctorDialogOpen(false)}
+          />
         </Dialog>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
 export default DoctorCard;
