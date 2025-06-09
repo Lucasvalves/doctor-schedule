@@ -28,7 +28,6 @@ export const POST = async (request: Request) => {
       if (!event.data.object.id) {
         throw new Error("Subscription ID not found");
       }
-      console.log("🚀 ~ POST ~ event.data.object:", event.data.object);
 
       const { parent, customer } = event.data
         .object as unknown as {
